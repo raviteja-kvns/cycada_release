@@ -61,7 +61,7 @@ def get_classes():
 
 def generate_images_info(split='train'):
     coco_images = []
-    img_files = glob(f'data/gta5/{split}/img/**/*')
+    img_files = glob(f'/mnt/data/gta5/{split}/img/**/*')
     for index, img_file in enumerate(img_files):
         coco_images.append({
             "id": index, "width": 1920, "height": 1080, "file_name": img_file
@@ -71,7 +71,7 @@ def generate_images_info(split='train'):
 
 def generate_labeled_images(classes, split='train'):
     # todo: multi processing
-    img_files = glob(f'data/gta5/{split}/cls/**/*')
+    img_files = glob(f'/mnt/data/gta5/{split}/cls/**/*')
     for index, img_file in enumerate(img_files):
         img = imread(img_file)
         target_img = np.zeros((img.shape[0], img.shape[1]), dtype='uint8')
@@ -150,7 +150,7 @@ def generate_bbox(classes, images_info, split='train'):
         'annotations': annotations
     }
 
-    with open(f'data/gta5/{split}/inst.json', 'w', encoding='utf-8') as f:
+    with open(f'/mnt/data/gta5/{split}/inst.json', 'w', encoding='utf-8') as f:
         json.dump(json_obj, f)
 
 

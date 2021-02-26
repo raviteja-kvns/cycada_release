@@ -7,9 +7,9 @@ dataset:
   num_classes: 9
   num_seg_classes: 19
   dataset: GTA5
-  dataset_path: "./data/gta5/"
+  dataset_path: "/mnt/data/gta5/"
   image_set: train
-  root_path: "./data/"
+  root_path: "/mnt/data/"
   test_image_set: val
 
 network:
