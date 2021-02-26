@@ -227,6 +227,9 @@ def segms_to_mask_wrt_box(roidb, segms, box, M):
     is understood to be enclosed in the given box and rasterized to an M x M
     mask. The resulting mask is therefore of shape (M, M).
     """
+    if M == 0:
+        return np.array([[]], dtype=np.float32)
+
     w = box[2] - box[0]
     h = box[3] - box[1]
 
