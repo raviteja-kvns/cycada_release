@@ -5,7 +5,7 @@
 #
 # Licensed under the Uber Non-Commercial License (the "License");
 # you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at the root directory of this project. 
+# You may obtain a copy of the License at the root directory of this project.
 #
 # See the License for the specific language governing permissions and
 # limitations under the License.
@@ -26,4 +26,4 @@ class RoIAlign(Module):
         self.spatial_scale = float(spatial_scale)
 
     def forward(self, features, rois):
-        return RoIAlignFunction(self.pooled_height, self.pooled_width, self.spatial_scale)(features, rois)
+        return RoIAlignFunction.apply(features, rois, self.pooled_height, self.pooled_width, self.spatial_scale)

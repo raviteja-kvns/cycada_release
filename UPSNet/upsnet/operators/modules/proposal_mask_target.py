@@ -5,7 +5,7 @@
 #
 # Licensed under the Uber Non-Commercial License (the "License");
 # you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at the root directory of this project. 
+# You may obtain a copy of the License at the root directory of this project.
 #
 # See the License for the specific language governing permissions and
 # limitations under the License.
@@ -17,12 +17,12 @@ import numpy as np
 import torch
 from torch.autograd import Variable
 from torch.nn.modules.module import Module
-from ..functions.proposal_mask_target import ProposalMaskTargetFunction
 from upsnet.dataset.json_dataset import add_proposals
 from upsnet.bbox.sample_rois import sample_rois
 from collections import defaultdict
 import time
 import pickle
+
 
 class ProposalMaskTarget(Module):
     def __init__(self, num_classes, batch_images, batch_rois, fg_fraction, mask_size, binary_thresh):
@@ -51,11 +51,12 @@ class ProposalMaskTarget(Module):
                 blobs[k].append(v)
 
         return torch.cat([torch.tensor(_, dtype=torch.float32, requires_grad=False).pin_memory().to(context, non_blocking=True) for _ in blobs['rois']], 0),\
-               torch.cat([torch.tensor(_, dtype=torch.int64, requires_grad=False).pin_memory().to(context, non_blocking=True) for _ in blobs['labels_int32']], 0),\
-               torch.cat([torch.tensor(_, dtype=torch.float32, requires_grad=False).pin_memory().to(context, non_blocking=True) for _ in blobs['bbox_targets']], 0),\
-               torch.cat([torch.tensor(_, dtype=torch.float32, requires_grad=False).pin_memory().to(context, non_blocking=True) for _ in blobs['bbox_inside_weights']], 0),\
-               torch.cat([torch.tensor(_, dtype=torch.float32, requires_grad=False).pin_memory().to(context, non_blocking=True) for _ in blobs['bbox_outside_weights']], 0),\
-               torch.cat([torch.tensor(_, dtype=torch.float32, requires_grad=False).pin_memory().to(context, non_blocking=True) for _ in blobs['mask_rois']], 0),\
-               torch.cat([torch.tensor(_, dtype=torch.float32, requires_grad=False).pin_memory().to(context, non_blocking=True) for _ in blobs['mask_int32']], 0), \
-               torch.cat([torch.tensor(_, dtype=torch.uint8, requires_grad=False).pin_memory().to(context, non_blocking=True) for _ in blobs['roi_has_mask_int32']], 0), \
-               torch.cat([torch.tensor(_, dtype=torch.int64, requires_grad=False).pin_memory().to(context, non_blocking=True) for _ in blobs['nongt_inds']], 0)
+            torch.cat([torch.tensor(_, dtype=torch.int64, requires_grad=False).pin_memory().to(context, non_blocking=True) for _ in blobs['labels_int32']], 0),\
+            torch.cat([torch.tensor(_, dtype=torch.float32, requires_grad=False).pin_memory().to(context, non_blocking=True) for _ in blobs['bbox_targets']], 0),\
+            torch.cat([torch.tensor(_, dtype=torch.float32, requires_grad=False).pin_memory().to(context, non_blocking=True) for _ in blobs['bbox_inside_weights']], 0),\
+            torch.cat([torch.tensor(_, dtype=torch.float32, requires_grad=False).pin_memory().to(context, non_blocking=True) for _ in blobs['bbox_outside_weights']], 0),\
+            torch.cat([torch.tensor(_, dtype=torch.float32, requires_grad=False).pin_memory().to(context, non_blocking=True) for _ in blobs['mask_rois']], 0),\
+            torch.cat([torch.tensor(_, dtype=torch.float32, requires_grad=False).pin_memory().to(context, non_blocking=True) for _ in blobs['mask_int32']], 0), \
+            torch.cat([torch.tensor(_, dtype=torch.uint8, requires_grad=False).pin_memory().to(context, non_blocking=True) for _ in blobs['roi_has_mask_int32']], 0), \
+            torch.cat([torch.tensor(_, dtype=torch.int64, requires_grad=False).pin_memory().to(
+                context, non_blocking=True) for _ in blobs['nongt_inds']], 0)
