@@ -49,7 +49,7 @@ train:
   momentum: 0.9
   batch_size: 1
   flip: false
-  gt_main_area: 100
+  gt_min_area: 100
 
   fcn_loss_weight: 1
   fcn_with_roi_loss: false
