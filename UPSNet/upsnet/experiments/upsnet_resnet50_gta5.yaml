@@ -40,11 +40,11 @@ train:
   snapshot_step: 1000
   resume: false
   begin_iteration: 0
-  max_iteration: 48000
+  max_iteration: 192000
   decay_iteration:
-  - 36000
-  warmup_iteration: 1500
-  lr: 0.005
+  - 144000
+  warmup_iteration: 6000
+  lr: 0.00125
   wd: 0.0001
   momentum: 0.9
   batch_size: 1
@@ -64,6 +64,6 @@ test:
   - 1024
   max_size: 2048
   batch_size: 1
-  test_iteration: 48000
+  test_iteration: 192000
   panoptic_stuff_area_limit: 2048
   vis_mask: false
