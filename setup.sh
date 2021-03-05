@@ -1,7 +1,7 @@
 export PYTHONPATH=".:${PYTHONPATH} "
 
 # Setting up necessary python paths to link the modules of upsnet and cycada works
-export PYTHONPATH="/home/vkonduru/domain/cycada/UPSNet/:/home/vkonduru/domain/cycada/:${PYTHONPATH}"
+export PYTHONPATH="$(pwd)/UPSNet/:$(pwd)/:${PYTHONPATH}"
 
 # Dependencies
 # CYCADA
