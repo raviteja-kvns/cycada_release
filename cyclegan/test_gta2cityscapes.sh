@@ -6,6 +6,6 @@ CUDA_VISIBLE_DEVICES=0 python test.py --name gta2cityscapes \
     --model cycle_gan \
     --batchSize 1 \
     --dataset_mode unaligned --dataroot /mnt/data/cyclegan_data/ \
-    --results_dir /ceph/gta5/cyclegan_data/adapted \
+    --results_dir /ceph/gta5/adapted \
     --checkpoints_dir /ceph/cycada/cyclegan_checkpoints/ \
     --which_direction AtoB
