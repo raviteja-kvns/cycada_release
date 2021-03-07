@@ -5,6 +5,7 @@ CUDA_VISIBLE_DEVICES=0 python test.py --name gta2cityscapes \
     --which_epoch 20 \
     --model cycle_gan \
     --batchSize 1 \
+    --phase train \
     --dataset_mode unaligned --dataroot /mnt/data/cyclegan_data/ \
-    --which_direction AtoB
+    --which_direction AtoB \
     --no_html
