@@ -1,10 +1,10 @@
     CUDA_VISIBLE_DEVICES=0 python test.py --name gta2cityscapes \
-    --resize_or_crop resize_and_crop \
+    --resize_or_crop scale_width \
     --loadSize=1920 --fineSize=1920 \
     --how_many 15000 \
-    --which_epoch 5 \
+    --which_epoch 20 \
     --model test \
-    --batchSize 32 \
+    --batchSize 1 \
     --dataset_mode single --dataroot /mnt/data/cyclegan_data/ \
     --results_dir /mnt/data/cyclegan_data/adapted \
     --checkpoints_dir /ceph/cycada/cyclegan_checkpoints/ \
