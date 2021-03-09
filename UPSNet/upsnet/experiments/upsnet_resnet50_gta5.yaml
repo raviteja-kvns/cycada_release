@@ -10,7 +10,7 @@ dataset:
   dataset_path: "./data/gta5/"
   image_set: train
   root_path: "./data/"
-  test_image_set: val
+  test_image_set: valsmall
 
 network:
   has_rpn: true
