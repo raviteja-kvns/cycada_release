@@ -303,8 +303,7 @@ class BaseDataset(torch.utils.data.Dataset):
 
                 logger.info("{:4s}| {:>5s} {:>5s} {:>5s} {:>6s} {:>7s} {:>7s} {:>7s}".format("IDX", "PQ", "SQ", "RQ", "IoU", "TP", "FP", "FN"))
                 for idx, result in results['per_class'].items():
-                    logger.info("{:4d} | {:5.1f} {:5.1f} {:5.1f} {:6.1f} {:7d} {:7d} {:7d}".format(idx, 100 * result['pq'], 100 * result['sq'], 100 * result['rq'], result['iou'], result['tp'],
-                                                                                             result['fp'], result['fn']))
+                    logger.info("{:4d} | {:5.1f} {:5.1f} {:5.1f}".format(idx, 100 * result['pq'], 100 * result['sq'], 100 * result['rq']))
 
             t_delta = time.time() - start_time
             print("Time elapsed: {:0.2f} seconds".format(t_delta))
