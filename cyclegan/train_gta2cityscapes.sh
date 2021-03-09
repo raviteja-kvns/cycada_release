@@ -10,4 +10,4 @@ CUDA_VISIBLE_DEVICES=0 python train.py --name gta2cityscapes \
                                        --which_direction AtoB \
                                        --display_id=0 \
                                        --checkpoints_dir='/ceph/cycada/cyclegan_checkpoints/' \
-                                       --save_epoch_freq=1 \
+                                       --save_epoch_freq=1
