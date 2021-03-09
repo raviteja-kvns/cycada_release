@@ -2,14 +2,16 @@
 output_path: "./output/upsnet/cityscapes"
 model_prefix: "upsnet_resnet_50_cityscapes_"
 symbol: resnet_50_upsnet
-gpus: '0,1,2,3'
+# gpus: '0,1,2,3'
+gpus: '0'
 dataset:
   num_classes: 9
   num_seg_classes: 19
   dataset: Cityscapes
-  dataset_path: "./data/cityscapes/"
+  # dataset_path: "/datasets/home/21/721/vkonduru/domain/cycada/data/cityscapes/"
+  dataset_path: "../data/cityscapes/"
   image_set: train
-  root_path: "./data/"
+  root_path: "../data/"
   test_image_set: val
 
 network:
