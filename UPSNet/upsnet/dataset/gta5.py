@@ -48,15 +48,17 @@ class GTA5(BaseDataset):
         self.image_dirs = {
             'train': os.path.join(config.dataset.dataset_path, 'train'),
             'val': os.path.join(config.dataset.dataset_path, 'val'),
+            'valsmall': os.path.join(config.dataset.dataset_path, 'valsmall'),
         }
 
         self.anno_files = {
             'train': os.path.join(config.dataset.dataset_path, 'train', 'inst.json'),
             'val': os.path.join(config.dataset.dataset_path, 'val', 'inst.json'),
+            'valsmall': os.path.join(config.dataset.dataset_path, 'valsmall', 'inst.json'),
         }
 
-        # self.panoptic_json_file = os.path.join(config.dataset.dataset_path, 'annotations', 'cityscapes_fine_val.json')
-        # self.panoptic_gt_folder = 'data/cityscapes/panoptic'
+        self.panoptic_json_file = os.path.join(config.dataset.dataset_path, 'valsmall', 'panoptic.json')
+        self.panoptic_gt_folder = os.path.join(config.dataset.dataset_path, 'valsmall')
 
         self.flip = flip
         self.result_path = result_path
@@ -255,51 +257,68 @@ class GTA5(BaseDataset):
         import matplotlib.pyplot as plt
         from matplotlib.patches import Polygon
         palette = {
-            'person': (220, 20, 60),
-            'rider': (255, 0, 0),
-            'car': (0, 0, 142),
-            'truck': (0, 0, 70),
-            'bus': (0, 60, 100),
-            'train': (0, 80, 100),
-            'motorcycle': (0, 0, 230),
-            'bicycle': (119, 11, 32),
-            #
+            'sky': (70, 130, 180),
             'road': (128, 64, 128),
             'sidewalk': (244, 35, 232),
+            'terrain': (152, 251, 152),
+            'tree': (87, 182, 35),
+            'vegetation': (35, 142, 35),
             'building': (70, 70, 70),
-            'wall': (102, 102, 156),
+            'infrastructure': (153, 153, 153),
             'fence': (190, 153, 153),
-            'pole': (153, 153, 153),
-            'sky': (70, 130, 180),
+            'billboard': (150, 20, 20),
             'traffic light': (250, 170, 30),
             'traffic sign': (220, 220, 0),
-            'vegetation': (107, 142, 35),
-            'terrain': (152, 251, 152)
+            'mobile barrier': (180, 180, 100),
+            'fire hydrant': (173, 153, 153),
+            'chair': (168, 153, 153),
+            'trash': (81, 0, 21),
+            'trash can': (81, 0, 81),
+            'person': (220, 20, 60),
+            'motorcycle': (0, 0, 230),
+            'car': (0, 0, 142),
+            'van': (0, 80, 100),
+            'bus': (0, 60, 100),
+            'truck': (0, 0, 70)
         }
         name2id = {
-            'road': 0,
-            'sidewalk': 1,
-            'building': 2,
-            'wall': 3,
-            'fence': 4,
-            'pole': 5,
-            'traffic light': 6,
-            'traffic sign': 7,
-            'vegetation': 8,
-            'terrain': 9,
-            'sky': 10
+            'sky': 0,
+            'road': 1,
+            'sidewalk': 2,
+            'terrain': 3,
+            'tree': 4,
+            'vegetation': 5,
+            'building': 6,
+            'infrastructure': 7,
+            'fence': 8,
+            'billboard': 9,
+            'traffic light': 10,
+            'traffic sign': 11,
+            'mobile barrier': 12,
+            'fire hydrant': 13,
+            'chair': 14,
+            'trash': 15,
+            'trash can': 16,
+            'person': 17,
+            'motorcycle': 18,
+            'car': 19,
+            'van': 20,
+            'bus': 21,
+            'truck': 22
         }
 
         self.classes = [
             '__background__',
+            'traffic light',
+            'fire hydrant',
+            'chair',
+            'trash can',
             'person',
-            'rider',
-            'car',
-            'truck',
-            'bus',
-            'train',
             'motorcycle',
-            'bicycle',
+            'car',
+            'van',
+            'bus',
+            'truck',
         ]
 
         if save_path is not None:
@@ -335,7 +354,7 @@ class GTA5(BaseDataset):
                     )
                     ax.text(bbox[0], bbox[1] - 2, name + '{:0.2f}'.format(score).lstrip('0'), fontsize=5, family='serif',
                             bbox=dict(facecolor='g', alpha=0.4, pad=0, edgecolor='none'), color='white')
-                    _, contour, hier = cv2.findContours(mask.copy(), cv2.RETR_CCOMP, cv2.CHAIN_APPROX_NONE)
+                    contour, hier = cv2.findContours(mask.copy(), cv2.RETR_CCOMP, cv2.CHAIN_APPROX_NONE)
                     color = (palette[name][0] / 255, palette[name][1] / 255, palette[name][2] / 255)
                     for c in contour:
                         ax.add_patch(
@@ -348,7 +367,7 @@ class GTA5(BaseDataset):
                 plt.show()
             else:
                 fig.savefig(os.path.join(save_path, '{}.png'.format(
-                    self.roidb[i]['image'].split('/')[-1][:-16])), dpi=200)
+                    self.roidb[i]['image'].split('/')[-1][:-4])), dpi=200)
             plt.close('all')
 
     def evaluate_masks(
@@ -361,18 +380,6 @@ class GTA5(BaseDataset):
             output_dir, 'segmentations_' + self.dataset.name + '_results')
         res_file += '.json'
 
-        os.environ['CITYSCAPES_DATASET'] = os.path.join(os.path.dirname(__file__), '../../data/cityscapes')
-        os.environ['CITYSCAPES_RESULTS'] = os.path.join(output_dir, 'inst_seg')
-        sys.path.insert(0, os.path.join(os.path.abspath(os.path.dirname(__file__)),
-                                        '..', '..', 'lib', 'dataset_devkit', 'cityscapesScripts'))
-        sys.path.insert(0, os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', '..', 'lib',
-                                        'dataset_devkit', 'cityscapesScripts', 'cityscapesscripts', 'evaluation'))
-
-        # Load the Cityscapes eval script *after* setting the required env vars,
-        # since the script reads their values into global variables (at load time).
-        import cityscapesscripts.evaluation.evalInstanceLevelSemanticLabeling as cityscapes_eval
-        sys.argv = []
-
         roidb = self.dataset.get_roidb()
         for i, entry in enumerate(roidb):
             im_name = entry['image']
@@ -383,7 +390,6 @@ class GTA5(BaseDataset):
             with open(txtname, 'w') as fid_txt:
                 for j in range(1, len(all_segms)):
                     clss = self.dataset.classes[j]
-                    clss_id = cityscapes_eval.name2label[clss].id
                     segms = all_segms[j][i]
                     boxes = all_boxes[j][i]
                     if segms == []:
@@ -397,52 +403,38 @@ class GTA5(BaseDataset):
                             'seg_results', basename,
                             basename + '_' + clss + '_{}.png'.format(k))
                         # write txt
-                        fid_txt.write('{} {} {}\n'.format(pngname, clss_id, score))
+                        fid_txt.write('{} {}\n'.format(pngname, score))
                         # save mask
                         os.makedirs(os.path.join(output_dir, 'inst_seg', 'seg_results', basename), exist_ok=True)
                         cv2.imwrite(os.path.join(output_dir, 'inst_seg', pngname), mask * 255)
-        cityscapes_eval.main()
         return None
 
     def get_pallete(self):
-
-        pallete_raw = np.zeros((256, 3)).astype('uint8')
         pallete = np.zeros((256, 3)).astype('uint8')
 
-        pallete_raw[5, :] = [111,  74,   0]
-        pallete_raw[6, :] = [81,   0,  81]
-        pallete_raw[7, :] = [128,  64, 128]
-        pallete_raw[8, :] = [244,  35, 232]
-        pallete_raw[9, :] = [250, 170, 160]
-        pallete_raw[10, :] = [230, 150, 140]
-        pallete_raw[11, :] = [70,  70,  70]
-        pallete_raw[12, :] = [102, 102, 156]
-        pallete_raw[13, :] = [190, 153, 153]
-        pallete_raw[14, :] = [180, 165, 180]
-        pallete_raw[15, :] = [150, 100, 100]
-        pallete_raw[16, :] = [150, 120,  90]
-        pallete_raw[17, :] = [153, 153, 153]
-        pallete_raw[18, :] = [153, 153, 153]
-        pallete_raw[19, :] = [250, 170,  30]
-        pallete_raw[20, :] = [220, 220,   0]
-        pallete_raw[21, :] = [107, 142,  35]
-        pallete_raw[22, :] = [152, 251, 152]
-        pallete_raw[23, :] = [70, 130, 180]
-        pallete_raw[24, :] = [220,  20,  60]
-        pallete_raw[25, :] = [255,   0,   0]
-        pallete_raw[26, :] = [0,   0, 142]
-        pallete_raw[27, :] = [0,   0,  70]
-        pallete_raw[28, :] = [0,  60, 100]
-        pallete_raw[29, :] = [0,   0,  90]
-        pallete_raw[30, :] = [0,   0, 110]
-        pallete_raw[31, :] = [0,  80, 100]
-        pallete_raw[32, :] = [0,   0, 230]
-        pallete_raw[33, :] = [119,  11,  32]
-
-        train2regular = [7, 8, 11, 12, 13, 17, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 31, 32, 33]
-
-        for i in range(len(train2regular)):
-            pallete[i, :] = pallete_raw[train2regular[i], :]
+        pallete[0, :] = [70, 130, 180]
+        pallete[1, :] = [128, 64, 128]
+        pallete[2, :] = [244, 35, 232]
+        pallete[3, :] = [152, 251, 152]
+        pallete[4, :] = [87, 182, 35]
+        pallete[5, :] = [35, 142, 35]
+        pallete[6, :] = [70, 70, 70]
+        pallete[7, :] = [153, 153, 153]
+        pallete[8, :] = [190, 153, 153]
+        pallete[9, :] = [150, 20, 20]
+        pallete[10, :] = [250, 170, 30]
+        pallete[11, :] = [220, 220, 0]
+        pallete[12, :] = [180, 180, 100]
+        pallete[13, :] = [173, 153, 153]
+        pallete[14, :] = [168, 153, 153]
+        pallete[15, :] = [81, 0, 21]
+        pallete[16, :] = [81, 0, 81]
+        pallete[17, :] = [220, 20, 60]
+        pallete[18, :] = [0, 0, 230]
+        pallete[19, :] = [0, 0, 142]
+        pallete[20, :] = [0, 80, 100]
+        pallete[21, :] = [0, 60, 100]
+        pallete[22, :] = [0, 0, 70]
 
         pallete = pallete.reshape(-1)
 
@@ -455,12 +447,12 @@ class GTA5(BaseDataset):
         confusion_matrix = np.zeros((config.dataset.num_seg_classes, config.dataset.num_seg_classes))
         for i, roidb in enumerate(self.roidb):
 
-            seg_gt = np.array(Image.open(roidb['image'].replace('images', 'labels').replace(
-                'leftImg8bit.png', 'gtFine_labelTrainIds.png'))).astype('float32')
+            seg_gt = np.array(Image.open(roidb['image'].replace('img', 'lblcls').replace(
+                'jpg', 'png'))).astype('float32')
 
-            seg_pathes = os.path.split(roidb['image'].replace('images', 'labels').replace(
-                'leftImg8bit.png', 'gtFine_labelTrainIds.png'))
-            res_image_name = seg_pathes[-1][:-len('_gtFine_labelTrainIds.png')]
+            seg_pathes = os.path.split(roidb['image'].replace('img', 'lblcls').replace(
+                'jpg', 'png'))
+            res_image_name = seg_pathes[-1][:-len('.png')]
             res_save_path = os.path.join(res_file_folder, res_image_name + '.png')
 
             seg_pred = Image.open(res_save_path)
@@ -514,7 +506,7 @@ class GTA5(BaseDataset):
         for i, roidb in enumerate(self.roidb):
 
             seg_pathes = os.path.split(roidb['image'])
-            res_image_name = seg_pathes[-1][:-len('_leftImg8bit.png')]
+            res_image_name = seg_pathes[-1][:-len('.png')]
             res_save_path = os.path.join(res_file_folder, res_image_name + '.png')
 
             segmentation_result = np.uint8(np.squeeze(np.copy(segmentation_results[i])))

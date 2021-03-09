@@ -5,6 +5,7 @@ import json
 import os
 import os.path as path
 from numba import njit
+import skimage.measure
 
 
 def get_classes():
@@ -61,7 +62,7 @@ def get_classes():
 
 def generate_images_info(split='train'):
     coco_images = []
-    img_files = glob(f'data/gta5/{split}/img/**/*')
+    img_files = sorted(glob(f'data/gta5/{split}/img/**/*'))
     for index, img_file in enumerate(img_files):
         coco_images.append({
             "id": index, "width": 1920, "height": 1080, "file_name": img_file
@@ -103,8 +104,7 @@ def _find_bounding_box(mask, shape):
     return pos_left, pos_up, pos_right, pos_down
 
 
-def generate_bbox(classes, images_info, split='train'):
-    id = 0
+def generate_bbox(classes, images_info, split='train', id=0):
     annotations = []
     categories = []
     used_classes = set()
@@ -153,10 +153,70 @@ def generate_bbox(classes, images_info, split='train'):
     with open(f'data/gta5/{split}/inst.json', 'w', encoding='utf-8') as f:
         json.dump(json_obj, f)
 
+    return json_obj
+
+
+def generate_bbox_panoptic(classes, images_info, split='train'):
+    id = 0
+    annotations = []
+    categories = []
+    for index, image_info in enumerate(images_info):
+        cls_file = image_info['file_name'].replace('img', 'cls').replace('jpg', 'png')
+        cls_img = imread(cls_file)
+        for class_info in [class_info for class_info in classes if class_info['instance_eval'] == 0 and class_info['trainid'] != 255]:
+            masks = (cls_img[:, :, 0] != class_info['red']) & (
+                cls_img[:, :, 1] == class_info['green']) & (cls_img[:, :, 2] == class_info['blue'])
+            cls_label_img = skimage.measure.label(masks)
+            for i in range(1, np.max(cls_label_img)+1):
+                mask = cls_label_img == i
+                area = np.count_nonzero(mask)
+                if area > 0:
+                    pos_left, pos_up, pos_right, pos_down = _find_bounding_box(
+                        mask, mask.shape)
+                    y, x = np.nonzero(mask)
+                    category_id = class_info['trainid']
+                    annotations.append({
+                        'id': id,
+                        'image_id': image_info['id'],
+                        'category_id': category_id,
+                        'bbox': [pos_left, pos_up, pos_right - pos_left, pos_down - pos_up],
+                        'iscrowd': 0,
+                        'area': area
+                    })
+                    id += 1
+        if index % 100 == 0:
+            print(index)
+
+    for class_info in classes:
+        categories.append({
+            'id': class_info['trainid'],
+            'name': class_info['classname'],
+            'color': [class_info['red'], class_info['green'], class_info['blue']],
+            'isthing': class_info['instance_eval']
+        })
+
+    annotations_old = annotations + generate_bbox(classes, images_info, split, id)['annotations']
+    annotations = []
+    for image_info in images_info:
+        annotations.append({
+            'image_id': image_info['id'],
+            'file_name': image_info['file_name'],
+            'segments_info': [annotation for annotation in annotations_old if annotation['image_id'] == image_info['id']]
+        })
+
+    json_obj = {
+        'images': images_info,
+        'categories': categories,
+        'annotations': annotations
+    }
+
+    with open(f'data/gta5/{split}/panoptic.json', 'w', encoding='utf-8') as f:
+        json.dump(json_obj, f)
+
 
 # generate labeled images (for sematic segmentation)
 # generate_labeled_images(get_classes())
 # generate_labeled_images(get_classes(), 'val')
 # # generate bound box (for instance segmentation)
 # generate_bbox(get_classes(), generate_images_info())
-generate_bbox(get_classes(), generate_images_info('val'), 'val')
+generate_bbox_panoptic(get_classes(), generate_images_info('valsmall'), 'valsmall')
