@@ -23,10 +23,18 @@ def parse_args(description=''):
     parser.add_argument('--eval_only', help='if only eval existing results', action='store_true')
     parser.add_argument('--weight_path', help='manually specify model weights', type=str, default='')
 
-    args, rest = parser.parse_known_args()
+    try:
+        args, rest = parser.parse_known_args()
+    except Exception as e:
+        print(e.message, e.args, " error occurred when parsing arguments @ 1")
+
     # update config
     update_config(args.cfg)
 
     # training
-    args = parser.parse_args()
+    try:
+        args = parser.parse_args()
+    except:
+        print(" error occurred when parsing arguments @ 2")
+
     return args

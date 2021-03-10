@@ -42,16 +42,18 @@ base_model="base_models/upsnet_resnet_50_gta5_121000.pth"
 outdir="${resdir}/${model}/lr${lr}_crop${crop}_ld${lambda_d}_lg${lambda_g}_momentum${momentum}"
 
 # UPSNet config
-ups_net_config='../UPSNet/upsnet/experiments/upsnet_resnet50_gta5.yaml'
+ups_net_config='cycada/configs/upsnet_resnet50_gta5_cycada.yaml'
 
 # Run python script #
 CUDA_VISIBLE_DEVICES=${gpu} python3 scripts/train_ups_adda.py \
     ${outdir} \
     --dataset ${src} --dataset ${tgt} --datadir ${datadir} \
-    --ups_net_config ${ups_net_config} \
+    --cfg ${ups_net_config} \
+    --weights_init ${base_model} \
+    --weight_path ${base_model} \
     --lr ${lr} --momentum ${momentum} --gpu 0 \
     --lambda_d ${lambda_d} --lambda_g ${lambda_g} \
-    --weights_init ${base_model} --model ${model} \
+    --model ${model} \
     --"${weight_share}" --${discrim} --no_lsgan \
     --max_iter ${max_iter} --crop_size ${crop} --batch ${batch} \
     --snapshot $snapshot

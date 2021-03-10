@@ -25,6 +25,7 @@ from cycada.util import to_tensor_raw
 from cycada.tools.util import make_variable
 
 def check_label(label, num_cls):
+
     "Check that no labels are out of range"
     label_classes = np.unique(label.numpy().flatten())
     label_classes = label_classes[label_classes < 255]
@@ -94,6 +95,7 @@ def seg_accuracy(score, label, num_cls):
 @click.option('--cls_weights', type=click.Path(exists=True))
 @click.option('--weights_discrim', type=click.Path(exists=True))
 @click.option('--weights_init', type=click.Path(exists=True))
+@click.option('--weight_path', type=click.Path(exists=True))
 @click.option('--model', default='fcn8s', type=click.Choice(models.keys()))
 @click.option('--lsgan/--no_lsgan', default=False)
 @click.option('--num_cls', type=int, default=19)
@@ -104,13 +106,13 @@ def seg_accuracy(score, label, num_cls):
 @click.option('--train_discrim_only', default=False)
 @click.option('--discrim_feat/--discrim_score', default=False)
 @click.option('--weights_shared/--weights_unshared', default=False)
-@click.option('--ups_net_config', default='')
+@click.option('--cfg', default="")
 
 
 def main(output, dataset, datadir, lr, momentum, snapshot, downscale, cls_weights, gpu, 
         weights_init, num_cls, lsgan, max_iter, lambda_d, lambda_g,
         train_discrim_only, weights_discrim, crop_size, weights_shared,
-        discrim_feat, half_crop, batch, model):
+        discrim_feat, half_crop, batch, model, cfg, weight_path):
     
     # So data is sampled in consistent way
     np.random.seed(1337)
