@@ -31,6 +31,7 @@ if [ ! -d images ]; then
     ln -s leftImg8bit/train/bremen/* images/
     ln -s leftImg8bit/train/cologne/* images/
     ln -s leftImg8bit/train/darmstaadt/* images/
+    ln -s leftImg8bit/train/dusseldorf/* images/
     ln -s leftImg8bit/train/erfurt/* images/
     ln -s leftImg8bit/train/hamburg/* images/
     ln -s leftImg8bit/train/hanover/* images/
