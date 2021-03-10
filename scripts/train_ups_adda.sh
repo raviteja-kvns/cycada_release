@@ -27,23 +27,28 @@ src='cyclegta5'
 tgt='cityscapes'
 datadir='./../data/'
 
-
 resdir="results/${src}_to_${tgt}/adda_ups_sgd/${weight_share}_nolsgan_${discrim}"
 
 # init with pre-trained cyclegta5 model
-model='ups'
+model='upsnet'
 baseiter=115000
 #model='fcn8s'
 #baseiter=100000
 
 
 # base_model="base_models/${model}-${src}-iter${baseiter}.pth"
+base_model="base_models/upsnet_resnet_50_gta5_121000.pth"
+
 outdir="${resdir}/${model}/lr${lr}_crop${crop}_ld${lambda_d}_lg${lambda_g}_momentum${momentum}"
 
+# UPSNet config
+ups_net_config='../UPSNet/upsnet/experiments/upsnet_resnet50_gta5.yaml'
+
 # Run python script #
-CUDA_VISIBLE_DEVICES=${gpu} python scripts/train_ups_adda.py \
+CUDA_VISIBLE_DEVICES=${gpu} python3 scripts/train_ups_adda.py \
     ${outdir} \
     --dataset ${src} --dataset ${tgt} --datadir ${datadir} \
+    --ups_net_config ${ups_net_config} \
     --lr ${lr} --momentum ${momentum} --gpu 0 \
     --lambda_d ${lambda_d} --lambda_g ${lambda_g} \
     --weights_init ${base_model} --model ${model} \

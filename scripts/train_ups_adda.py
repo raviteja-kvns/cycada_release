@@ -104,6 +104,7 @@ def seg_accuracy(score, label, num_cls):
 @click.option('--train_discrim_only', default=False)
 @click.option('--discrim_feat/--discrim_score', default=False)
 @click.option('--weights_shared/--weights_unshared', default=False)
+@click.option('--ups_net_config', default='')
 
 
 def main(output, dataset, datadir, lr, momentum, snapshot, downscale, cls_weights, gpu, 

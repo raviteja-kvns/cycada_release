@@ -16,7 +16,7 @@ num_cls=19
 outdir=results/${data}/${data}_${model}
 mkdir -p results/${data} 
 
-python scripts/train_fcn.py ${outdir} --model ${model} \
+python3 scripts/train_fcn.py ${outdir} --model ${model} \
     --num_cls ${num_cls} --gpu ${gpu} \
     --lr ${lr} -b ${batch} -m ${momentum} \
     --crop_size ${crop} --iterations ${iterations} \
