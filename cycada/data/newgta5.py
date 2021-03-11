@@ -94,7 +94,7 @@ class GTA5Params(DatasetParams):
     target_transform = None
 
 
-@register_dataset_obj('gta5')
+@register_dataset_obj('newgta5')
 class GTA5(data.Dataset):
 
     def __init__(self, root, num_cls=19, split='train', remap_labels=True,

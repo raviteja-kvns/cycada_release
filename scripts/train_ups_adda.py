@@ -1,3 +1,7 @@
+"""
+    Adapted from train_fcn_adda.py
+"""
+
 import logging
 import os
 import os.path
@@ -19,7 +23,8 @@ from torch.autograd import Variable
 from cycada.data.adda_datasets import AddaDataLoader
 from cycada.models import get_model
 from cycada.models.models import models
-from cycada.models import VGG16_FCN8s, Discriminator
+from cycada.models import VGG16_FCN8s
+from cycada.models import DiscriminatorUPSNet as Discriminator
 from cycada.util import config_logging
 from cycada.util import to_tensor_raw
 from cycada.tools.util import make_variable
@@ -144,7 +149,8 @@ def main(output, dataset, datadir, lr, momentum, snapshot, downscale, cls_weight
         net_src.eval()
 
     odim = 1 if lsgan else 2
-    idim = num_cls if not discrim_feat else 4096
+    # idim = num_cls if not discrim_feat else 4096
+    idim = 256
     print('discrim_feat', discrim_feat, idim)
     print('discriminator init weights: ', weights_discrim)
     discriminator = Discriminator(input_dim=idim, output_dim=odim, 

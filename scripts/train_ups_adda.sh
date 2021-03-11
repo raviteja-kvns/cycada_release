@@ -23,9 +23,9 @@ discrim='discrim_score'
 ########
 # Data #
 ########
-src='cyclegta5'
+src='newgta5'
 tgt='cityscapes'
-datadir='./../data/'
+datadir='./data/'
 
 resdir="results/${src}_to_${tgt}/adda_ups_sgd/${weight_share}_nolsgan_${discrim}"
 
@@ -45,7 +45,7 @@ outdir="${resdir}/${model}/lr${lr}_crop${crop}_ld${lambda_d}_lg${lambda_g}_momen
 ups_net_config='cycada/configs/upsnet_resnet50_gta5_cycada.yaml'
 
 # Run python script #
-CUDA_VISIBLE_DEVICES=${gpu} python3 scripts/train_ups_adda.py \
+CUDA_VISIBLE_DEVICES=${gpu} python3 -m pudb scripts/train_ups_adda.py \
     ${outdir} \
     --dataset ${src} --dataset ${tgt} --datadir ${datadir} \
     --cfg ${ups_net_config} \

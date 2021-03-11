@@ -212,6 +212,32 @@ class Discriminator(nn.Module):
         self.load_state_dict(torch.load(weights))
    
 
+class DiscriminatorUPSNet(nn.Module):
+    def __init__(self, input_dim=4096, output_dim=2, pretrained=False, weights_init=''):
+        super().__init__()
+        dim1 = 1024 if input_dim==4096 else 512
+        dim2 = int(dim1/2)
+        self.D = nn.Sequential(
+            nn.Conv2d(input_dim, dim1, 1),
+            nn.Dropout2d(p=0.5),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(dim1, dim2, 1),
+            nn.Dropout2d(p=0.5),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(dim2, output_dim, 1)
+            )
+
+        if pretrained and weights_init is not None:
+            self.load_weights(weights_init) 
+
+    def forward(self, x): 
+        d_score = self.D(x)
+        return d_score
+
+    def load_weights(self, weights):
+        print('Loading discriminator weights')
+        self.load_state_dict(torch.load(weights))
+
 
 class Transform_Module(nn.Module):
     def __init__(self, input_dim=4096):
