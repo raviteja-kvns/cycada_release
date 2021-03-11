@@ -1,5 +1,5 @@
 import enum
-import glob
+from glob import glob
 import os.path
 
 import numpy as np
@@ -110,15 +110,17 @@ class GTA5(data.Dataset):
 
     def collect_ids(self):
         img_files = glob(os.path.join(self.root, self.split, 'img', '**', '*'))
-        img_files = [file.replace(os.path.join(self.root, self.split, 'img'), '') for file in img_files]
+        img_files = [file.replace(os.path.join(self.root, self.split, 'img'), '')[1:] for file in img_files]
         img_files = sorted(img_files)
         return img_files
 
     def img_path(self, id):
-        return os.path.join(self.root, self.split, 'img', id)
+        _img_path = os.path.join(self.root, self.split, 'img', id)
+        
+        return _img_path
 
     def label_path(self, id):
-        return os.path.join(self.root, self.split, 'cls', id)
+        return os.path.join(self.root, self.split, 'cls', id.replace('.jpg', '.png'))
 
     def __getitem__(self, index):
         id = self.ids[index]
